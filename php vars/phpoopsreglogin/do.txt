@@ -1,0 +1,374 @@
+ how user can register and login using PHP Oops concepts.
+
+File Structure for this tutorial :
+
+index.php (User Registration form)
+sigin.php (User signin form)
+function.php (Database connection and function for username availability, registration, and login)
+welcome.php (After login user will redirect to this page)
+logout.php (for logout)
+MySQL table tblusers structure used in this tutorial
+
+CREATE TABLE `tblusers` (
+  `id` int(11) NOT NULL,
+  `FullName` varchar(120) DEFAULT NULL,
+  `Username` varchar(120) DEFAULT NULL,
+  `UserEmail` varchar(200) DEFAULT NULL,
+  `Password` varchar(250) DEFAULT NULL,
+  `RegDate` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+Now creates a function.php. In this file class Class DB_con, Inside this class define the database connection.Now inside this create your function for username availability, user registration and login.
+
+<?php
+define('DB_SERVER','localhost');// Your hostname
+define('DB_USER','root'); // Databse username
+define('DB_PASS' ,''); // Database Password
+define('DB_NAME', 'userdb');// Database name
+class DB_con
+{
+function __construct()
+{
+$con = mysqli_connect(DB_SERVER,DB_USER,DB_PASS,DB_NAME);
+$this->dbh=$con;
+// Check connection
+if (mysqli_connect_errno())
+{
+echo "Failed to connect to MySQL: " . mysqli_connect_error();
+}
+}
+
+// for username availblty
+public function usernameavailblty($uname) {
+$result =mysqli_query($this->dbh,"SELECT Username FROM tblusers WHERE Username='$uname'");
+return $result;
+
+}
+
+// Function for registration
+public function registration($fname,$uname,$uemail,$pasword)
+{
+$ret=mysqli_query($this->dbh,"insert into tblusers(FullName,Username,UserEmail,Password) values('$fname','$uname','$uemail','$pasword')");
+return $ret;
+}
+
+// Function for signin
+public function signin($uname,$pasword)
+{
+$result=mysqli_query($this->dbh,"select id,FullName from tblusers where Username='$uname' and Password='$pasword'");
+return $result;
+}
+
+}
+?>
+DB_con is the constructor function which will create localhost connection and database selection.
+
+public function usernameavailblty () function have one parameter which will check the username availability.
+
+public function registration() function have some parameter which will accept inputs from the html registration form.
+
+public function signin() function will check the user username, password is valid or not.
+
+Create a user registration form with the following fields:
+
+Fullname
+username
+Email
+Password
+<?php
+// include Function file
+include_once('function.php');
+// Object creation
+$userdata=new DB_con();
+if(isset($_POST['submit']))
+{
+// Posted Values
+$fname=$_POST['fullname'];
+$uname=$_POST['username'];
+$uemail=$_POST['email'];
+$pasword=md5($_POST['password']);
+//Function Calling
+$sql=$userdata->registration($fname,$uname,$uemail,$pasword);
+if($sql)
+{
+// Message for successfull insertion
+echo "<script>alert('Registration successfull.');</script>";
+echo "<script>window.location.href='signin.php'</script>";
+}
+else
+{
+// Message for unsuccessfull insertion
+echo "<script>alert('Something went wrong. Please try again');</script>";
+echo "<script>window.location.href='signin.php'</script>";
+}
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- This file has been downloaded from Bootsnipp.com. Enjoy! -->
+<title>User Registration using PHP OOPs Concept</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="assests/style.css" rel="stylesheet">
+<script src="assests/jquery-1.11.1.min.js"></script>
+<script src="assests/bootstrap.min.js"></script>
+<script>
+function checkusername(va) {
+$.ajax({
+type: "POST",
+url: "check_availability.php",
+data:'username='+va,
+success: function(data){
+$("#usernameavailblty").html(data);
+}
+});
+
+}
+</script>
+</head>
+<body>
+<form class="form-horizontal" action='' method="POST">
+<fieldset>
+<div id="legend" align="center">
+<legend class="">User Registration using PHP OOPs Concept</legend>
+</div>
+
+<div class="control-group">
+<!-- Fullname -->
+<label class="control-label" for="username">Fullname</label>
+<div class="controls">
+<input type="text" id="username" name="fullname" placeholder="" class="input-xlarge" required="true">
+</div>
+</div>
+
+
+<div class="control-group">
+<!-- Username -->
+<label class="control-label" for="username">Username</label>
+<div class="controls">
+<input type="text" id="username" name="username" onblur="checkusername(this.value)" class="input-xlarge" required="true">
+<span id="usernameavailblty"></span>
+</div>
+</div>
+
+<div class="control-group">
+<!-- E-mail -->
+<label class="control-label" for="email">E-mail</label>
+<div class="controls">
+<input type="email" id="email" name="email" placeholder="" class="input-xlarge" required="true">
+</div>
+</div>
+
+<div class="control-group">
+<!-- Password-->
+<label class="control-label" for="password">Password</label>
+<div class="controls">
+<input type="password" id="password" name="password" placeholder="" class="input-xlarge" required="true">
+</div>
+</div>
+
+<div class="control-group">
+<!-- Button -->
+<div class="controls">
+<button class="btn btn-success" type="submit" id="submit" name="submit">Register</button>
+</div>
+</div>
+
+<div class="control-group">
+<div class="controls">
+Already registered <a href="#">Signin</a>
+</div>
+</div>
+
+</fieldset>
+</form>
+<script type="text/javascript">
+</script>
+</body>
+</html>
+code for username availability(check_availability.php)
+
+<?php
+// include Function file
+include_once('function.php');
+// Object creation
+$uusername=new DB_con();
+// Getting Post value
+$uname= $_POST["username"]; 
+// Calling function
+$sql=$uusername->usernameavailblty($uname);
+$num=mysqli_num_rows($sql);
+if($num > 0)
+{
+echo "<span style='color:red'> Username already associated with another account .</span>";
+echo "<script>$('#submit').prop('disabled',true);</script>";
+} else{
+
+echo "<span style='color:green'> Unsername available for Registration .</span>";
+echo "<script>$('#submit').prop('disabled',false);</script>";
+}?>
+Code for user login (signin.php)
+<?php
+// include Function file
+include_once('function.php');
+// Object creation
+$userdata=new DB_con();
+if(isset($_POST['submit']))
+{
+// Posted Values
+$fname=$_POST['fullname'];
+$uname=$_POST['username'];
+$uemail=$_POST['email'];
+$pasword=md5($_POST['password']);
+//Function Calling
+$sql=$userdata->registration($fname,$uname,$uemail,$pasword);
+if($sql)
+{
+// Message for successfull insertion
+echo "<script>alert('Registration successfull.');</script>";
+echo "<script>window.location.href='signin.php'</script>";
+}
+else
+{
+// Message for unsuccessfull insertion
+echo "<script>alert('Something went wrong. Please try again');</script>";
+echo "<script>window.location.href='signin.php'</script>";
+}
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>User Registration using PHP OOPs Concept</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="assests/style.css" rel="stylesheet">
+<script src="assests/jquery-1.11.1.min.js"></script>
+<script src="assests/bootstrap.min.js"></script>
+<script>
+function checkusername(va) {
+$.ajax({
+type: "POST",
+url: "check_availability.php",
+data:'username='+va,
+success: function(data){
+$("#usernameavailblty").html(data);
+}
+});
+
+}
+</script>
+</head>
+<body>
+<form class="form-horizontal" action='' method="POST">
+<fieldset>
+<div id="legend" align="center">
+<legend class="">User Registration using PHP OOPs Concept</legend>
+</div>
+
+<div class="control-group">
+<!-- Fullname -->
+<label class="control-label" for="username">Fullname</label>
+<div class="controls">
+<input type="text" id="username" name="fullname" placeholder="" class="input-xlarge" required="true">
+</div>
+</div>
+
+<div class="control-group">
+<!-- Username -->
+<label class="control-label" for="username">Username</label>
+<div class="controls">
+<input type="text" id="username" name="username" onblur="checkusername(this.value)" class="input-xlarge" required="true">
+<span id="usernameavailblty"></span>
+</div>
+</div>
+
+<div class="control-group">
+<!-- E-mail -->
+<label class="control-label" for="email">E-mail</label>
+<div class="controls">
+<input type="email" id="email" name="email" placeholder="" class="input-xlarge" required="true">
+</div>
+</div>
+
+<div class="control-group">
+<!-- Password-->
+<label class="control-label" for="password">Password</label>
+<div class="controls">
+<input type="password" id="password" name="password" placeholder="" class="input-xlarge" required="true">
+</div>
+</div>
+
+<div class="control-group">
+<!-- Button -->
+<div class="controls">
+<button class="btn btn-success" type="submit" id="submit" name="submit">Register</button>
+</div>
+</div>
+
+<div class="control-group">
+<div class="controls">
+Already registered <a href="#">Signin</a>
+</div>
+</div>
+
+</fieldset>
+</form>
+<script type="text/javascript">
+</script>
+</body>
+</html>
+After successful login user will redirect to welcome.php page.
+
+<?php
+session_start();
+if(strlen($_SESSION['uid'])=="")
+{
+header('location:logout.php');
+} else {
+?><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>User Registraion using PHP OOPs Concept</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="assests/style.css" rel="stylesheet">
+<script src="assests/jquery-1.11.1.min.js"></script>
+<script src="assests/bootstrap.min.js"></script>
+</head>
+<body>
+<form class="form-horizontal" action='' method="POST">
+<fieldset>
+<div id="legend">
+<legend class="" align="center">Welcome Back : <?php echo $_SESSION['fname'];?></legend>
+</div>
+
+<div class="control-group" align="center">
+<!-- Button -->
+<div class="controls">
+<a href="logout.php" class="btn btn-success" type="submit" name="signin">Logout</a>
+</div>
+</div>
+
+</fieldset>
+</form>
+<script type="text/javascript">
+</script>
+</body>
+</html>
+<?php } ?>
+Logout page (logout.php)
+<?php
+session_start();
+session_destroy();
+header('location:signin.php');
+?>
+How to run this script
+
+Download the zip file.
+Extract the file and copy the phpoopsreglogin folder.
+3.Paste inside root directory(for xampp xampp/htdocs, for wamp wamp/www, for lamp var/www/HTML)
+Open PHPMyAdmin (http://localhost/phpmyadmin)
+Create a database with the name userdb
+Import userdb.sql file(given inside the zip package in the SQL file folder).
+Run the script http://localhost/phpoopsreglogin (frontend).
