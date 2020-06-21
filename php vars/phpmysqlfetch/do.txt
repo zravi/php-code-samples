@@ -1,0 +1,174 @@
+how to fetch data from MySQL using PHP.
+We can fetch the data from MySQL using the following methods given below :
+
+mysqli_fetch_array
+mysqli_fetch_row
+mysqli_fetch_assoc
+mysqli_fetch_object
+First Create a database with name demo. Now create a table with name data.
+Here the strcuture of table
+
+CREATE TABLE IF NOT EXISTS `data` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `contactno` bigint(20) NOT NULL,
+  `gender` varchar(255) NOT NULL,
+  `education` varchar(255) NOT NULL,
+  `address` longtext NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+structure of data table
+Code for mysql connection with php(config.php)
+
+<?php
+define('DB_SERVER','localhost');
+define('DB_USER','root');
+define('DB_PASS' ,'');
+define('DB_NAME', 'demos');
+$con = mysqli_connect(DB_SERVER,DB_USER,DB_PASS,DB_NAME);
+// Check connection
+if (mysqli_connect_errno())
+{
+ echo "Failed to connect to MySQL: " . mysqli_connect_error();
+}
+?>
+Fetch data from mysql using mysqli_fetch_array
+Fetch a result row as an associative array, a numeric array and also it fetches by both associative & numeric array.This function will actually return an array with both the contents of mysqli_fetch_row and mysqli_fetch_assoc merged into one. It will both have numeric and string keys.
+
+<table width="100%"  border="1">
+<tr>
+<th>Sr no.</th>
+<th>Name</th>
+<th>Email</th>
+<th>Contact no.</th>
+<th>Gender</th>
+<th>Education</th>
+<th>Address</th></tr>
+<?php
+$query=mysqli_query($con,"select * from data");
+$cnt=1;
+while($row=mysqli_fetch_array($query))
+{
+?>
+<tr>
+<td><?php echo $cnt;?></td>
+<td><?php echo $row['name'];?></td>
+<td><?php echo $row['email'];?></td>
+<td><?php echo $row['contactno'];?></td>
+<td><?php echo $row['gender'];?></td>
+<td><?php echo $row['education'];?></td>
+<td><?php echo $row['address'];?></td>
+ </tr>
+/* Now here both associative array and numeric array will work. */
+<tr>
+<td><?php echo $cnt;?></td>
+<td><?php echo $row['1'];?></td>
+<td><?php echo $row['2'];?></td>
+<td><?php echo $row['3'];?></td>
+<td><?php echo $row['4'];?></td>
+<td><?php echo $row['5'];?></td>
+<td><?php echo $row['6'];?></td>
+ </tr>
+ <?php
+$cnt=$cnt+1;
+ } ?>
+</table>
+Fetch data from mysql using mysqli_fetch_row
+Mysqli_fetch_row fetch result row an numeric way. This function return a row where the value will come in the order as they are defined in the query, and the keys will span from 0 to one less than the number of columns selected.
+
+<h3>How to Insert Data into MySql Using PHP(mysqli_fetch_row) </h3>
+<hr >
+<table width="100%"  border="1">
+<tr>
+<th>Sr no.</th>
+<th>Name</th>
+<th>Email</th>
+<th>Contact no.</th>
+<th>Gender</th>
+<th>Education</th>
+<th>Address</th></tr>
+<?php
+$query=mysqli_query($con,"select * from data");
+$cnt=1;
+while($row=mysqli_fetch_row($query))
+{
+?>
+<tr>
+<td><?php echo $cnt;?></td>
+<td><?php echo $row['1'];?></td>
+<td><?php echo $row['2'];?></td>
+<td><?php echo $row['3'];?></td>
+<td><?php echo $row['4'];?></td>
+<td><?php echo $row['5'];?></td>
+<td><?php echo $row['6'];?></td>
+ </tr>
+ <?php
+$cnt=$cnt+1;
+ } ?>
+</table>
+Fetch data from mysql using mysqli_fetch_assoc()
+Fetch a result row as an associative array.This function will return a row as an associative array where the column names will be the keys storing corresponding value.
+
+<h3>How to Insert Data into MySql Using PHP(mysqi_fetch_assoc) </h3>
+<hr >
+<table width="100%"  border="1">
+<tr>
+<th>Sr no.</th>
+<th>Name</th>
+<th>Email</th>
+<th>Contact no.</th>
+<th>Gender</th>
+<th>Education</th>
+<th>Address</th></tr>
+<?php
+$query=mysqli_query($con,"select * from data");
+$cnt=1;
+while($row=mysqli_fetch_assoc($query))
+{
+?
+<tr>
+<td><?php echo $cnt;?></td>
+<td><?php echo $row['name'];?></td>
+<td><?php echo $row['email'];?></td>
+<td><?php echo $row['contactno'];?></td>
+<td><?php echo $row['gender'];?></td>
+<td><?php echo $row['education'];?></td>
+<td><?php echo $row['address'];?></td>
+ </tr>
+ <?php
+$cnt=$cnt+1;
+ } ?>
+</table>
+Fetch data from mysql using mysqli_fetch_object()
+Fetch a result row as an object.
+
+<h3>How to Insert Data into MySql Using PHP(mysqli_fetch_object) </h3>
+<hr >
+<table width="100%"  border="1">
+ <tr>
+<th>Sr no.</th>
+<th>Name</th>
+<th>Email</th>
+<th>Contact no.</th>
+ <th>Gender</th>
+<th>Education</th>
+<th>Address</th></tr>
+<?php
+$query=mysqli_query($con,"select * from data");
+$cnt=1;
+while($row=mysqli_fetch_object($query))
+{
+?>
+<tr>
+<td><?php echo $cnt;?></td>
+<td><?php echo $row->name;?></td>
+<td><?php echo $row->email;?></td>
+<td><?php echo $row->contactno;?></td>
+<td><?php echo $row->gender;?></td>
+<td><?php echo $row->education;?></td>
+<td><?php echo $row->address;?></td>
+ </tr>
+ <?php
+$cnt=$cnt+1;
+ } ?>
+</table>
