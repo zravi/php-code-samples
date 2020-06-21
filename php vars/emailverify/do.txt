@@ -1,0 +1,132 @@
+how to verify a registered email id using PHP.
+
+
+This tutorial include following files
+1.Registration file(index.php)
+2.Email Verification file(email_verification.php)
+3.Login file(login.php)
+4. Welcome file(welcome.php)
+5. Logout file(logout.php)
+6.Database Connection(config.php)
+Database include one table(userregistration)
+Structure of userregistration table
+
+CREATE TABLE IF NOT EXISTS `userregistration` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `activationcode` varchar(255) NOT NULL,
+  `status` int(11) NOT NULL,
+  `postingdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+User Registration form(index.php)
+
+<form name="insert" action="" method="post">
+<table width="100%"  border="0">
+<tr>
+<th height="62" scope="row">Name </th>
+<td width="71%"><input type="text" name="name" id="name" value=""  class="form-control" required /></td>
+</tr>
+<tr>
+<th height="62" scope="row">Email id </th>
+<td width="71%"><input type="email" name="email" id="email" value=""  class="form-control" required /></td>
+</tr>
+<tr>
+<th height="62" scope="row">Password </th>
+<td width="71%"><input type="password" name="password" id="password" value=""  class="form-control" required /></td>
+</tr>
+<tr>
+<th height="62" scope="row"></th>
+<td width="71%"><input type="submit" name="submit" value="Submit" class="btn-group-sm" /> </td>
+</tr>
+</table>
+</form>
+Php code for data insertion or sending verification mail. Put this code top of the index.php
+
+<?php
+include_once("config.php");
+if(isset($_POST['submit']))
+{
+$name=$_POST['name'];
+$email=$_POST['email'];
+$password=md5($_POST['password']);
+$status=0;
+$activationcode=md5($email.time());
+$query=mysqli_query($con,"insert into userregistration(name,email,password,activationcode,status) values('$name','$email','$password','$activationcode','$status')");
+ if($query)
+ {
+$to=$email;
+$msg= "Thanks for new Registration.";
+$subject="Email verification (phpgurukul.com)";
+$headers .= "MIME-Version: 1.0"."\r\n";
+$headers .= 'Content-type: text/html; charset=iso-8859-1'."\r\n";
+$headers .= 'From:PHPGurukul | Programing Blog <info@phpgurukul.com>'."\r\n";
+$ms.="<html></body><div><div>Dear $name,</div></br></br>";
+$ms.="<div style='padding-top:8px;'>Please click The following link For verifying and activation of your account</div>
+<div style='padding-top:10px;'><a href='http://www.phpgurukul.com/demos/emailverify/email_verification.php?code=$activationcode'>Click Here</a></div>
+<div style='padding-top:4px;'>Powered by <a href='phpgurukul.com'>phpgurukul.com</a></div></div>
+</body></html>";
+mail($to,$subject,$ms,$headers);
+echo "<script>alert('Registration successful, please verify in the registered Email-Id');</script>";
+echo "<script>window.location = 'login.php';</script>";;
+}
+else
+{
+echo "<script>alert('Data not inserted');</script>";
+}
+}
+?>
+Code for Email verification (email_verification.php). After clicking the verification link you will redirect to email_verification.php
+
+<?php
+include 'config.php';
+if(!empty($_GET['code']) && isset($_GET['code']))
+{
+$code=$_GET['code'];
+$sql=mysqli_query($con,"SELECT * FROM userregistration WHERE activationcode='$code'");
+$num=mysqli_fetch_array($sql);
+if($num>0)
+{
+$st=0;
+$result =mysqli_query($con,"SELECT id FROM userregistration WHERE activationcode='$code' and status='$st'");
+$result4=mysqli_fetch_array($result);
+if($result4>0)
+ {
+$st=1;
+$result1=mysqli_query($con,"UPDATE userregistration SET status='$st' WHERE activationcode='$code'");
+$msg="Your account is activated";
+}
+else
+{
+$msg ="Your account is already active, no need to activate again";
+}
+}
+else
+{
+$msg ="Wrong activation code.";
+}
+}
+?>
+After successful verification. You can Login (login.php)
+login form
+
+<form name="insert" action="" method="post">
+<table width="100%"  border="0">
+<tr>
+<td colspan="2"><font color="#FF0000"><?php echo $_SESSION['action1']; ?><?php echo $_SESSION['action1']="";?></font></td>
+</tr>
+<tr>
+<th height="62" scope="row">Email id </th>
+<td width="71%"><input type="email" name="email" id="email" value=""  class="form-control" required /></td>
+</tr>
+<tr>
+ <th height="62" scope="row">Password </th>
+ <td width="71%"><input type="password" name="password" id="password" value=""  class="form-control" required /></td>
+</tr>
+<tr>
+<th height="62" scope="row"></th>
+<td width="71%"><input type="submit" name="login" value="Submit" class="btn-group-sm" /> </td>
+</tr>
+</table>
+</form>
