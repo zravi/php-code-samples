@@ -1,0 +1,178 @@
+ how to insert data into MySql using PHP.
+
+First Create a database with name demo. Now create a table with name data.
+Here the strcuture of table
+
+CREATE TABLE IF NOT EXISTS `data` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `contactno` bigint(20) NOT NULL,
+  `gender` varchar(255) NOT NULL,
+  `education` varchar(255) NOT NULL,
+  `address` longtext NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+Code for mysql connection with php
+
+<?php
+define('DB_SERVER','localhost');
+define('DB_USER','root');
+define('DB_PASS' ,'');
+define('DB_NAME', 'demos');
+$conn = mysql_connect(DB_SERVER,DB_USER,DB_PASS)
+or
+die('localhost connection problem'.mysql_error());
+mysql_select_db(DB_NAME, $conn);
+?>
+Create a HTML Form for user inputs
+
+<form name="insert" action="" method="post">
+<table width="100%"  border="0">
+<tr>
+<th height="62" scope="row">Name </th>
+<td width="71%"><input type="text" name="name" id="name" value=""  class="form-control" required />
+</td>
+</tr>
+<tr>
+<th height="62" scope="row">Email id </th>
+<td width="71%"><input type="email" name="email" id="email" value=""  class="form-control" required />
+</td>
+</tr>
+<tr>
+<th height="62" scope="row">Contact no</th>
+<td width="71%">
+<input type="text" name="contactno" id="contactno" value=""  class="form-control" maxlength="10" required /></td>
+</tr>
+<tr>
+<th height="62" scope="row">Gender</th>
+<td width="71%"><input type="radio" name="gender" value="Male" checked >Male
+<input type="radio" name="gender" value="Female" >female</td>
+</tr>
+<tr>
+<th height="62" scope="row">Education</th>
+<td width="71%"><select name="education" id="email" class="form-control" required >
+<option value="">Select your Education</option>
+<option value="Post Graduate">Post Graduate</option>
+<option value="Graduate">Graduate</option>
+<option value="Intermediate">Intermediate</option>
+<option value="High School">High School</option>
+<option value="Other">Other</option>
+</select></td>
+</tr>
+<tr>
+<th height="62" scope="row">Address</th>
+<td width="71%"><textarea name="addrss" class="form-control"  required></textarea> </td>
+</tr>
+<tr>
+<th height="62" scope="row"></th>
+<td width="71%"><input type="submit" name="submit" value="Submit" class="btn-group-sm" /> </td>
+</tr>
+</table>
+</form>
+Now get user inputs and store in the PHP variables
+
+$name=$_POST['name'];
+$email=$_POST['email'];
+$contactno=$_POST['contactno'];
+$gender=$_POST['gender'];
+$education=$_POST['education'];
+$adress=$_POST['addrss'];
+Query for insert data into mysql using PHP
+
+$query=mysqli_query($conn,"insert into data(name,email,contactno,gender,education,address)
+values('$name','$email','$contactno','$gender','$education','$adress')");
+Full PHP Script for insert data into database using mysql
+
+if(isset($_POST['submit']))
+{
+$name=$_POST['name'];
+$email=$_POST['email'];
+$contactno=$_POST['contactno'];
+$gender=$_POST['gender'];
+$education=$_POST['education'];
+$adress=$_POST['addrss'];
+$query=mysqli_query($conn,"insert into data(name,email,contactno,gender,education,address)
+values('$name','$email','$contactno','$gender','$education','$adress')");
+if($query)
+{
+echo "<script>alert('Data inserted successfully');</script>";
+}
+else
+{
+echo "<script>alert('Data not inserted');</script>";
+}
+}
+Here is the full code that we have written during this tutorial:
+
+<?php
+include_once("config.php");
+if(isset($_POST['submit']))
+{
+$name=$_POST['name'];
+$email=$_POST['email'];
+$contactno=$_POST['contactno'];
+$gender=$_POST['gender'];
+$education=$_POST['education'];
+$adress=$_POST['addrss'];
+$query=mysql_query("insert into data(name,email,contactno,gender,education,address)
+values('$name','$email','$contactno','$gender','$education','$adress')");
+if($query)
+{
+echo "<script>alert('Data inserted successfully');</script>";
+}
+else
+{
+echo "<script>alert('Data not inserted');</script>";
+}
+}
+ ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body>
+<form name="insert" action="" method="post">
+<table width="100%"  border="0">
+<tr>
+<th height="62" scope="row">Name </th>
+<td width="71%"><input type="text" name="name" id="name" value=""  class="form-control" required />
+</td>
+</tr>
+<tr>
+<th height="62" scope="row">Email id </th>
+<td width="71%"><input type="email" name="email" id="email" value=""  class="form-control" required />
+</td>
+</tr>
+<tr>
+<th height="62" scope="row">Contact no</th>
+<td width="71%">
+<input type="text" name="contactno" id="contactno" value=""  class="form-control" maxlength="10" required /></td>
+</tr>
+<tr>
+<th height="62" scope="row">Gender</th>
+<td width="71%"><input type="radio" name="gender" value="Male" checked >Male
+<input type="radio" name="gender" value="Female" >female</td>
+</tr>
+<tr>
+<th height="62" scope="row">Education</th>
+<td width="71%"><select name="education" id="email" class="form-control" required >
+<option value="">Select your Education</option>
+<option value="Post Graduate">Post Graduate</option>
+<option value="Graduate">Graduate</option>
+<option value="Intermediate">Intermediate</option>
+<option value="High School">High School</option>
+<option value="Other">Other</option>
+</select></td>
+</tr>
+<tr>
+<th height="62" scope="row">Address</th>
+<td width="71%"><textarea name="addrss" class="form-control"  required></textarea> </td>
+</tr>
+<tr>
+<th height="62" scope="row"></th>
+<td width="71%"><input type="submit" name="submit" value="Submit" class="btn-group-sm" /> </td>
+</tr>
+</table>
+</form>
+</body>
+</html>
